@@ -1,10 +1,13 @@
 package com.focuszen.services;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.focuszen.dto.UserRequestDTO;
 import com.focuszen.dto.UserResponseDTO;
 import com.focuszen.entity.User;
+import com.focuszen.enums.Role;
+
 import com.focuszen.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -26,8 +30,9 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .password(dto.getPassword())
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .profilePicture(dto.getProfilePicture())
+                .role(Role.USER)
                 .build();
 
         User saved = userRepository.save(user);
