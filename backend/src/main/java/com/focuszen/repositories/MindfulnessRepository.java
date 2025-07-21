@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.focuszen.entity.BreakLog;
+import com.focuszen.entity.MindfulnessLog;
 import com.focuszen.entity.User;
 
-public interface BreakRepository extends JpaRepository<BreakLog, Long> {
-    List<BreakLog> findByUser(User user);
-    @Query("SELECT COALESCE(SUM(b.durationMinutes), 0) FROM Break b WHERE b.user = :user AND b.startTime BETWEEN :start AND :end")
+public interface MindfulnessRepository extends JpaRepository<MindfulnessLog, Long> {
+    List<MindfulnessLog> findByUser(User user);
+    @Query("SELECT COALESCE(SUM(m.durationMinutes), 0) FROM Mindfulness m WHERE m.user = :user AND m.startTime BETWEEN :start AND :end")
     long sumDurationInMinutesByUserAndDateBetween(@Param("user") User user, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

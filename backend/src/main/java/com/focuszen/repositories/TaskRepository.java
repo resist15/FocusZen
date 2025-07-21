@@ -1,12 +1,15 @@
 package com.focuszen.repositories;
 
-import com.focuszen.entity.Task;
-import com.focuszen.entity.User;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.focuszen.entity.Task;
+import com.focuszen.entity.User;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByUser(User user);
     List<Task> findByUserAndCompleted(User user, boolean completed);
+    long countByUserAndCompletedTrueAndDueDateBetween(User user, LocalDateTime start, LocalDateTime end);
 }
