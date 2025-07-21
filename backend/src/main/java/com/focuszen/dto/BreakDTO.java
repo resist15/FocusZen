@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class BreakDTO {
     private Long id;
     private String type;
+    private int startTime;
     private int durationInMinutes;
     private LocalDateTime timestamp;
 }

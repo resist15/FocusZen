@@ -12,6 +12,6 @@ import com.focuszen.entity.User;
 
 public interface MindfulnessRepository extends JpaRepository<MindfulnessLog, Long> {
     List<MindfulnessLog> findByUser(User user);
-    @Query("SELECT COALESCE(SUM(m.durationMinutes), 0) FROM Mindfulness m WHERE m.user = :user AND m.startTime BETWEEN :start AND :end")
+    @Query("SELECT COALESCE(SUM(m.durationInMinutes), 0) FROM MindfulnessLog m WHERE m.user = :user AND m.startTime BETWEEN :start AND :end")
     long sumDurationInMinutesByUserAndDateBetween(@Param("user") User user, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

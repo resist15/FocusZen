@@ -25,6 +25,7 @@ public class MindfulnessServiceImpl implements MindfulnessService {
         User user = userRepository.findByUsername(username).orElseThrow();
         MindfulnessLog log = MindfulnessLog.builder()
                 .activityType(dto.getActivityType())
+                .startTime(dto.getStartTime())
                 .durationInMinutes(dto.getDurationInMinutes())
                 .timestamp(dto.getTimestamp())
                 .user(user)
@@ -40,6 +41,7 @@ public class MindfulnessServiceImpl implements MindfulnessService {
         return mindfulnessRepository.findByUser(user).stream().map(log -> MindfulnessDTO.builder()
                 .id(log.getId())
                 .activityType(log.getActivityType())
+                .startTime(log.getStartTime())
                 .durationInMinutes(log.getDurationInMinutes())
                 .timestamp(log.getTimestamp())
                 .build()).collect(Collectors.toList());

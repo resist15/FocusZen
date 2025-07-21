@@ -19,6 +19,8 @@ public class MindfulnessLog {
 
     private String activityType; // e.g., "Meditation", "Breathing", "Journaling"
 
+    private int startTime;
+    
     private int durationInMinutes;
 
     private LocalDateTime timestamp;

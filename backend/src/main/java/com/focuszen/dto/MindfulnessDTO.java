@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class MindfulnessDTO {
     private Long id;
     private String activityType;
+    private int startTime;
     private int durationInMinutes;
     private LocalDateTime timestamp;
 }

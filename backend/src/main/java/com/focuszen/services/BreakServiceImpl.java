@@ -25,6 +25,7 @@ public class BreakServiceImpl implements BreakService {
         User user = userRepository.findByUsername(username).orElseThrow();
         BreakLog breakLog = BreakLog.builder()
                 .type(breakDTO.getType())
+                .startTime(breakDTO.getStartTime())
                 .durationInMinutes(breakDTO.getDurationInMinutes())
                 .timestamp(breakDTO.getTimestamp())
                 .user(user)
@@ -43,6 +44,7 @@ public class BreakServiceImpl implements BreakService {
                 .type(b.getType())
                 .durationInMinutes(b.getDurationInMinutes())
                 .timestamp(b.getTimestamp())
+                .startTime(b.getStartTime())
                 .build()).collect(Collectors.toList());
     }
 
