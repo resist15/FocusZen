@@ -8,4 +8,5 @@ public class UserResponseDTO {
     private String name;
     private String email;
     private String profilePicture;
+    private String username;
 }
