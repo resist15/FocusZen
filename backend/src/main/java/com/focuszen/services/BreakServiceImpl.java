@@ -22,7 +22,7 @@ public class BreakServiceImpl implements BreakService {
 
     @Override
     public BreakDTO logBreak(BreakDTO breakDTO, String username) {
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = userRepository.findByEmail(username).orElseThrow();
         BreakLog breakLog = BreakLog.builder()
                 .type(breakDTO.getType())
                 .startTime(breakDTO.getStartTime())
@@ -38,7 +38,7 @@ public class BreakServiceImpl implements BreakService {
 
     @Override
     public List<BreakDTO> getUserBreaks(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = userRepository.findByEmail(username).orElseThrow();
         return breakRepository.findByUser(user).stream().map(b -> BreakDTO.builder()
                 .id(b.getId())
                 .type(b.getType())

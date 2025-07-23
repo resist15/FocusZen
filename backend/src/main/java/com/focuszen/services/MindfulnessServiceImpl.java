@@ -22,7 +22,7 @@ public class MindfulnessServiceImpl implements MindfulnessService {
 
     @Override
     public MindfulnessDTO logActivity(MindfulnessDTO dto, String username) {
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = userRepository.findByEmail(username).orElseThrow();
         MindfulnessLog log = MindfulnessLog.builder()
                 .activityType(dto.getActivityType())
                 .startTime(dto.getStartTime())
@@ -37,7 +37,7 @@ public class MindfulnessServiceImpl implements MindfulnessService {
 
     @Override
     public List<MindfulnessDTO> getUserMindfulnessLogs(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = userRepository.findByEmail(username).orElseThrow();
         return mindfulnessRepository.findByUser(user).stream().map(log -> MindfulnessDTO.builder()
                 .id(log.getId())
                 .activityType(log.getActivityType())
