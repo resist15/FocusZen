@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { toast } from "sonner";
-import { ChevronUp, Plus, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { toast } from "sonner";
+import { Plus, Trash2 } from "lucide-react";
 import api from "@/lib/axios";
 
 interface GoalDTO {
@@ -38,7 +38,7 @@ export default function GoalsPage() {
     try {
       const res = await api.get("/goals");
       setGoals(res.data);
-    } catch (err) {
+    } catch {
       toast.error("Failed to fetch goals");
     }
   };
@@ -62,10 +62,16 @@ export default function GoalsPage() {
     }
   };
 
-  const handleProgress = async (id: number, current: number) => {
+  const handleSliderChange = async (goal: GoalDTO, value: number) => {
     try {
-      const res = await api.put(`/goals/${id}/progress?progress=${current + 1}`);
-      setGoals((prev) => prev.map((g) => (g.id === id ? res.data : g)));
+      const updatedGoal = {
+        ...goal,
+        currentValue: value,
+        completed: value >= goal.targetValue,
+      };
+
+      const res = await api.put(`/goals/${goal.id}`, updatedGoal);
+      setGoals((prev) => prev.map((g) => (g.id === goal.id ? res.data : g)));
       toast.success("Progress updated");
     } catch {
       toast.error("Failed to update progress");
@@ -95,9 +101,7 @@ export default function GoalsPage() {
   const handleSaveEdit = async (goalId: number) => {
     try {
       const res = await api.put(`/goals/${goalId}`, editForm);
-      setGoals((prev) =>
-        prev.map((g) => (g.id === goalId ? res.data : g))
-      );
+      setGoals((prev) => prev.map((g) => (g.id === goalId ? res.data : g)));
       setEditingGoalId(null);
       toast.success("Goal updated");
     } catch {
@@ -109,6 +113,7 @@ export default function GoalsPage() {
     <div className="max-w-4xl mx-auto py-10 px-4">
       <h2 className="text-2xl font-bold mb-4">Goals</h2>
 
+      {/* New Goal Form */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end mb-6">
         <div>
           <Label>Title</Label>
@@ -146,12 +151,12 @@ export default function GoalsPage() {
         </Button>
       </div>
 
+      {/* Goals List */}
       <div className="space-y-4">
         {goals.map((goal) => {
-          const percent = Math.min(
-            100,
-            Math.round((goal.currentValue / goal.targetValue) * 100)
-          );
+          const percent = goal.targetValue
+            ? Math.min(100, Math.round((goal.currentValue / goal.targetValue) * 100))
+            : 0;
 
           return (
             <div
@@ -217,23 +222,40 @@ export default function GoalsPage() {
                     <div className="flex gap-2">
                       <Button
                         size="icon"
-                        variant="ghost"
-                        onClick={() => handleProgress(goal.id!, goal.currentValue)}
+                        variant="outline"
+                        onClick={() => startEditing(goal)}
                       >
-                        <ChevronUp className="w-4 h-4" />
-                      </Button>
-                      <Button size="icon" variant="outline" onClick={() => startEditing(goal)}>
                         ✏️
                       </Button>
-                      <Button size="icon" variant="destructive" onClick={() => handleDelete(goal.id!)}>
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={() => handleDelete(goal.id!)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
-                  <Progress value={percent} />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {goal.currentValue} / {goal.targetValue}
-                  </p>
+
+                  <div className="mt-2">
+                    <Slider
+                      min={0}
+                      max={goal.targetValue}
+                      step={1}
+                      value={[goal.currentValue]}
+                      onValueChange={([val]) => {
+                        setGoals((prev) =>
+                          prev.map((g) =>
+                            g.id === goal.id ? { ...g, currentValue: val } : g
+                          )
+                        );
+                      }}
+                      onValueCommit={([val]) => handleSliderChange(goal, val)}
+                    />
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {goal.currentValue} / {goal.targetValue} ({percent}%)
+                    </div>
+                  </div>
                 </>
               )}
             </div>

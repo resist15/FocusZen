@@ -3,24 +3,24 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ChevronUp, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import api from "@/lib/axios";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BreakDTO {
   id?: number;
   type: string;
   startTime: number;
   durationInMinutes: number;
-  timestamp?: string;
 }
 
 export default function BreaksPage() {
   const [breaks, setBreaks] = useState<BreakDTO[]>([]);
   const [type, setType] = useState("Short");
-  const [startTime, setStartTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(5);
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +36,7 @@ export default function BreaksPage() {
   const handleAddBreak = async () => {
     try {
       setLoading(true);
+      const startTime = Date.now();
       const res = await api.post("/breaks", {
         type,
         startTime,
@@ -43,7 +44,6 @@ export default function BreaksPage() {
       });
       setBreaks([res.data, ...breaks]);
       toast.success("Break logged!");
-      setStartTime(0);
       setDuration(5);
     } catch {
       toast.error("Failed to log break");
@@ -67,52 +67,89 @@ export default function BreaksPage() {
   }, []);
 
   return (
-    <div className="p-4 max-w-2xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold">Break Logger</h1>
-
-      <div className="space-y-2">
-        <Label>Type</Label>
-        <Input value={type} onChange={(e) => setType(e.target.value)} />
-        <Label>Start Time (epoch ms)</Label>
-        <Input
-          type="number"
-          value={startTime}
-          onChange={(e) => setStartTime(Number(e.target.value))}
-        />
-        <Label>Duration (minutes)</Label>
-        <Input
-          type="number"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
-        />
-        <Button disabled={loading} onClick={handleAddBreak}>
-          <Plus className="w-4 h-4 mr-2" />
-          Log Break
-        </Button>
+    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+      <div>
+        <h1 className="text-3xl font-bold pb-2">Log your Breaks</h1>
+        <p className="text-muted-foreground">
+          Track your short or long breaks to balance productivity and recovery.
+        </p>
       </div>
 
-      <div className="space-y-4">
-        {breaks.map((b) => (
-          <div
-            key={b.id}
-            className="border rounded-md p-4 flex items-center justify-between"
-          >
-            <div>
-              <p className="font-medium">{b.type}</p>
-              <p className="text-sm text-muted-foreground">
-                {new Date(b.startTime).toLocaleString()}
-              </p>
-              <Progress value={(b.durationInMinutes / 60) * 100} className="mt-2" />
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Logging Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Log a Break</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select break type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Short">Short</SelectItem>
+                  <SelectItem value="Long">Long</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => handleDelete(b.id!)}
-            >
-              <Trash2 className="w-4 h-4" />
+
+            <div className="space-y-2">
+              <Label>Duration (minutes)</Label>
+              <Input
+                type="number"
+                min={1}
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+              />
+            </div>
+
+            <Button disabled={loading} onClick={handleAddBreak} className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Log Break
             </Button>
-          </div>
-        ))}
+          </CardContent>
+        </Card>
+
+        {/* Break List */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Your Breaks</h2>
+          <AnimatePresence>
+            {breaks.length === 0 ? (
+              <p className="text-muted-foreground">No breaks logged yet.</p>
+            ) : (
+              breaks.map((b) => (
+                <motion.div
+                  key={b.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="flex justify-between items-start p-4">
+                    <div className="space-y-1">
+                      <p className="text-lg font-semibold">{b.type}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Start: {new Date(b.startTime).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Duration: {b.durationInMinutes} minutes
+                      </p>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleDelete(b.id!)}
+                    >
+                      <Trash2 className="w-5 h-5 text-destructive" />
+                    </Button>
+                  </Card>
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
