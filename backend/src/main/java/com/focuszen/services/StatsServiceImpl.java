@@ -4,6 +4,7 @@ import com.focuszen.dto.StatsResponseDTO;
 import com.focuszen.entity.Task;
 import com.focuszen.entity.User;
 import com.focuszen.repositories.BreakRepository;
+import com.focuszen.repositories.MindfulnessRepository;
 import com.focuszen.repositories.TaskRepository;
 import com.focuszen.repositories.UserRepository;
 import com.focuszen.services.StatsService;
@@ -20,7 +21,7 @@ public class StatsServiceImpl implements StatsService {
     private final TaskRepository taskRepository;
     private final BreakRepository breakRepository;
     private final UserRepository userRepository;
-
+    private final MindfulnessRepository mindfulnessRepository;
     @Override
     public StatsResponseDTO getWeeklyStats(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
@@ -30,7 +31,7 @@ public class StatsServiceImpl implements StatsService {
 
         int completedTasks = taskRepository.countByUserAndCompletedTrueAndDueDateAfter(user, oneWeekAgo);
         int totalBreakMinutes = breakRepository.sumDurationByUserSince(user.getId(), oneWeekAgo);
-        int totalMindfulnessMinutes = 0;
+        int totalMindfulnessMinutes = mindfulnessRepository.sumMindfulnessDurationSince(user.getId(), oneWeekAgo);
         return new StatsResponseDTO(completedTasks, totalBreakMinutes, totalMindfulnessMinutes);
     }
 }

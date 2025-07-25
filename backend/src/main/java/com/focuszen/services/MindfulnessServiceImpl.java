@@ -3,11 +3,13 @@ package com.focuszen.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.focuszen.dto.MindfulnessDTO;
 import com.focuszen.entity.MindfulnessLog;
 import com.focuszen.entity.User;
+import com.focuszen.exceptions.ResourceNotFoundException;
 import com.focuszen.repositories.MindfulnessRepository;
 import com.focuszen.repositories.UserRepository;
 
@@ -48,11 +50,15 @@ public class MindfulnessServiceImpl implements MindfulnessService {
     }
 
     @Override
-    public void deleteMindfulnessLog(Long logId, String username) {
-        MindfulnessLog log = mindfulnessRepository.findById(logId).orElseThrow();
-        if (!log.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+    public void deleteMindfulnessLog(Long logId, String email) throws ResourceNotFoundException {
+        MindfulnessLog log = mindfulnessRepository.findById(logId)
+            .orElseThrow(() -> new ResourceNotFoundException("Log not found"));
+
+        if (!log.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException("You are not authorized to delete this log");
         }
+
         mindfulnessRepository.delete(log);
     }
+
 }

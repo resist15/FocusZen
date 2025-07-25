@@ -1,6 +1,7 @@
 package com.focuszen.controllers;
 
 import com.focuszen.dto.MindfulnessDTO;
+import com.focuszen.exceptions.ResourceNotFoundException;
 import com.focuszen.services.MindfulnessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class MindfulnessController {
     }
 
     @DeleteMapping("/{logId}")
-    public ResponseEntity<Void> deleteLog(@PathVariable Long logId, Authentication auth) {
+    public ResponseEntity<Void> deleteLog(@PathVariable Long logId, Authentication auth) throws ResourceNotFoundException {
         mindfulnessService.deleteMindfulnessLog(logId, auth.getName());
         return ResponseEntity.noContent().build();
     }

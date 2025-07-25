@@ -34,7 +34,14 @@ public class GlobalExceptionHandler {
         response.put("error", "Access denied");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
-
+    
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "An error occurred: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         Map<String, String> response = new HashMap<>();

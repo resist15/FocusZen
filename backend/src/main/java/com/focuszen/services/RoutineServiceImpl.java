@@ -54,10 +54,8 @@ public class RoutineServiceImpl implements RoutineService {
 
         List<RoutineEntry> entries = entryRepository.findByRoutineAndDate(routine, localDate);
         if (!entries.isEmpty()) {
-            // Toggle off (delete existing entry)
             entryRepository.deleteAll(entries);
         } else {
-            // Toggle on (create new entry)
             RoutineEntry entry = RoutineEntry.builder()
                     .routine(routine)
                     .date(localDate)
@@ -74,6 +72,34 @@ public class RoutineServiceImpl implements RoutineService {
                         .routineId(entry.getRoutine().getId())
                         .date(entry.getDate().toString())
                         .build())
+                .collect(Collectors.toList());
+    }
+    @Override
+    public void deleteRoutine(Long routineId, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Routine routine = routineRepository.findById(routineId)
+            .orElseThrow(() -> new RuntimeException("Routine not found"));
+
+        if (!routine.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized to delete this routine");
+        }
+
+        List<RoutineEntry> entries = entryRepository.findByRoutineId(routineId);
+        entryRepository.deleteAll(entries);
+
+        routineRepository.delete(routine);
+    }
+
+    @Override
+    public List<Long> getCompletedRoutineIds(String email, LocalDate date) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        List<Routine> userRoutines = routineRepository.findByUser(user);
+
+        return entryRepository.findByRoutineInAndDate(userRoutines, date)
+                .stream()
+                .map(entry -> entry.getRoutine().getId())
+                .distinct()
                 .collect(Collectors.toList());
     }
 

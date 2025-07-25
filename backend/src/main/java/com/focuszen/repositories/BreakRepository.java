@@ -18,4 +18,6 @@ public interface BreakRepository extends JpaRepository<BreakLog, Long> {
     
     @Query("SELECT COALESCE(SUM(b.durationInMinutes), 0) FROM BreakLog b WHERE b.user.id = :userId AND b.timestamp > :since")
     int sumDurationByUserSince(@Param("userId") Long userId, @Param("since") LocalDateTime since);
+    
+    long countByUser(User user);
 }

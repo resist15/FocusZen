@@ -51,7 +51,7 @@ public class BreakServiceImpl implements BreakService {
     @Override
     public void deleteBreak(Long breakId, String username) {
         BreakLog breakLog = breakRepository.findById(breakId).orElseThrow();
-        if (!breakLog.getUser().getUsername().equals(username)) {
+        if (!breakLog.getUser().getEmail().equals(username)) {
             throw new RuntimeException("Unauthorized");
         }
         breakRepository.delete(breakLog);

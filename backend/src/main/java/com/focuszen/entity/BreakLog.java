@@ -19,7 +19,7 @@ public class BreakLog {
 
     private String type; // e.g., "Short", "Long", "Pomodoro"
 
-    private int startTime;
+    private long startTime;
     
     private int durationInMinutes;
 

@@ -6,7 +6,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class DashboardSummaryDTO {
-    private long tasksCompletedToday;
-    private long totalBreakMinutes;
-    private long totalMindfulnessMinutes;
+    private long totalTasks;
+    private long completedTasks;
+    private long totalGoals;
+    private long breakCount;
+    private long mindfulnessCount;
+    private double weeklyRoutineCompletion;
 }
